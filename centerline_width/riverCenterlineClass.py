@@ -10,7 +10,7 @@ import centerline_width
 class riverCenterline:
 
     def __init__(self,
-                 csv_data=None,
+                 df=None,
                  optional_cutoff=None,
                  interpolate_data=False,
                  interpolate_n=5,
@@ -18,7 +18,7 @@ class riverCenterline:
                  equal_distance=10,
                  ellipsoid="WGS84"):
         centerline_width.errorHandlingRiverCenterlineClass(
-            csv_data=csv_data,
+            csv_data="",
             optional_cutoff=optional_cutoff,
             interpolate_data=interpolate_data,
             interpolate_n=interpolate_n,
@@ -27,10 +27,24 @@ class riverCenterline:
             ellipsoid=ellipsoid)
 
         # Description and dataframe
-        self.river_name = csv_data
+
+        # Check the dataframe for the correct columns. It must have at least 4 columns
+        # There must be rlat, rlon, llat, and llon
+        if df is None:
+            raise ValueError("Please provide a dataframe")
+        if not isinstance(df, pd.DataFrame):
+            raise ValueError("Please provide a dataframe")
+        if len(df.columns) < 4:
+            raise ValueError(
+                "The dataframe must have at least 4 columns: rlat, rlon, llat, llon"
+            )
+        if "rlat" not in df.columns or "rlon" not in df.columns or "llat" not in df.columns or "llon" not in df.columns:
+            raise ValueError(
+                "The dataframe must have at least 4 columns: rlat, rlon, llat, llon"
+            )
+
         self.interpolate_data = interpolate_data
         self.interpolate_n = interpolate_n
-        df = pd.read_csv(csv_data)
         if optional_cutoff:
             df = df.head(optional_cutoff)
         self.df_len = len(df)
