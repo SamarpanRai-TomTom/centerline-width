@@ -5,7 +5,7 @@ import logging
 # External Python libraries
 import numpy as np
 from scipy.io import savemat
-
+from shapely.geometry import Point, LineString
 # Internal centerline_width reference to access functions, global variables, and error handling
 import centerline_width
 
@@ -15,6 +15,41 @@ logger.setLevel(logging.WARNING)
 stream_handler = logging.StreamHandler()
 logger.addHandler(stream_handler)
 
+
+def getCenterlineAsGeometry(
+                    river_object=None,
+                      centerline_type="Voronoi",
+                      coordinate_unit="Decimal Degrees"):
+
+    if coordinate_unit == "Decimal Degrees":
+        if centerline_type == "Voronoi":
+            centerline_coordinates_by_type = river_object.centerlineVoronoi
+        if centerline_type == "Equal Distance":
+            centerline_coordinates_by_type = river_object.centerlineEqualDistance
+        if centerline_type == "Evenly Spaced":
+            centerline_coordinates_by_type = river_object.centerlineEvenlySpaced
+        if centerline_type == "Smoothed":
+            centerline_coordinates_by_type = river_object.centerlineSmoothed
+    if coordinate_unit == "Relative Distance":
+        if centerline_type == "Voronoi":
+            centerline_coordinates_by_type = river_object.centerlineVoronoiRelative
+        if centerline_type == "Equal Distance":
+            centerline_coordinates_by_type = river_object.centerlineEqualDistanceRelative
+        if centerline_type == "Evenly Spaced":
+            centerline_coordinates_by_type = river_object.centerlineEvenlySpacedRelative
+        if centerline_type == "Smoothed":
+            centerline_coordinates_by_type = river_object.centerlineSmoothedRelative
+
+    points = []    
+    
+    if centerline_coordinates_by_type is not None:
+        for latitude_longitude in centerline_coordinates_by_type:
+            points.append(Point([latitude_longitude[1], latitude_longitude[0]]))
+        return LineString(points)
+    else:
+        logger.warn(
+            f"\nWARNING, no {centerline_type} centerline coordinates found, {save_to_csv} file generated will be empty"
+        )
 
 def saveCenterlineCSV(river_object=None,
                       save_to_csv=None,

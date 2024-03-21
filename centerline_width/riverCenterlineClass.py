@@ -166,6 +166,10 @@ class riverCenterline:
         self.centerlineSmoothedRelative = centerline_width.relativeCenterlineCoordinates(
             self.left_bank_coordinates[0], self.centerlineSmoothed,
             self.ellipsoid)
+        
+    def centerline_as_geometry(self):
+        self.centerlineSmoothed
+
 
     def plotCenterline(self,
                        centerline_type="Voronoi",
